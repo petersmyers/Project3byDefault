@@ -1,0 +1,73 @@
+---
+title: "CitiBikeData"
+author: "Peter Myers"
+date: "6/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Import the 2018 data
+`201801` <- read.csv("~/Desktop/HomeworkTableau/201801-citibike-tripdata.csv")
+`201802` <- read.csv("~/Desktop/HomeworkTableau/201802-citibike-tripdata.csv")
+`201803` <- read.csv("~/Desktop/HomeworkTableau/201803-citibike-tripdata.csv")
+`201804` <- read.csv("~/Desktop/HomeworkTableau/201804-citibike-tripdata.csv")
+`201805` <- read.csv("~/Desktop/HomeworkTableau/201805-citibike-tripdata.csv")
+`201806` <- read.csv("~/Desktop/HomeworkTableau/201806-citibike-tripdata.csv")
+`201807` <- read.csv("~/Desktop/HomeworkTableau/201807-citibike-tripdata.csv")
+`201808` <- read.csv("~/Desktop/HomeworkTableau/201808-citibike-tripdata.csv")
+`201809` <- read.csv("~/Desktop/HomeworkTableau/201809-citibike-tripdata.csv")
+`201810` <- read.csv("~/Desktop/HomeworkTableau/201810-citibike-tripdata.csv")
+`201811` <- read.csv("~/Desktop/HomeworkTableau/201811-citibike-tripdata.csv")
+`201812` <- read.csv("~/Desktop/HomeworkTableau/201812-citibike-tripdata.csv")
+
+# Import the 2014 data
+`201401` <- read.csv("~/Desktop/HomeworkTableau/2014-01 - Citi Bike trip data.csv")
+`201402` <- read.csv("~/Desktop/HomeworkTableau/2014-02 - Citi Bike trip data.csv")
+`201403` <- read.csv("~/Desktop/HomeworkTableau/2014-03 - Citi Bike trip data.csv")
+`201404` <- read.csv("~/Desktop/HomeworkTableau/2014-04 - Citi Bike trip data.csv")
+`201405` <- read.csv("~/Desktop/HomeworkTableau/2014-05 - Citi Bike trip data.csv")
+`201406` <- read.csv("~/Desktop/HomeworkTableau/2014-06 - Citi Bike trip data.csv")
+`201407` <- read.csv("~/Desktop/HomeworkTableau/2014-07 - Citi Bike trip data.csv")
+`201408` <- read.csv("~/Desktop/HomeworkTableau/2014-08 - Citi Bike trip data.csv")
+`201409` <- read.csv("~/Desktop/HomeworkTableau/201409-citibike-tripdata.csv")
+`201410` <- read.csv("~/Desktop/HomeworkTableau/201410-citibike-tripdata.csv")
+`201411` <- read.csv("~/Desktop/HomeworkTableau/201411-citibike-tripdata.csv")
+`201412` <- read.csv("~/Desktop/HomeworkTableau/201412-citibike-tripdata.csv")
+```
+
+```{r}
+# Because all of the columns line up with one another (I think) we just need to squish everything together
+# (don't believe me on the column names, YOU can go through one by one and check them with the handy command:
+#   colnames(`201801`))
+all = rbind(`201801`, `201802`, `201803`, `201804`, `201805`, `201806`, `201807`, `201808`, `201809`, 
+            `201810`, `201811`, `201812`, `201401`, `201401`, `201402`, `201403`, `201404`, `201405`, 
+            `201406`, `201407`, `201408`, `201409`, `201410`, `201411`, `201412`)
+
+# Oh Fuck. This new matrix is nearly 26M rows long. 
+# Tableau only allows for 15M rows.
+# Gotta remove some shit and will try to do this as randomly as possible so as to not impact any given variable more than the others... let's borrow a bit from machine learning and randomly pull a "training" dataset!
+all_index <- sample(1:nrow(all), 0.038 * nrow(all))
+all_train <- all[all_index, -16]
+
+# some data cleaning
+# Remove some "na"s in any field
+all_train_clean <- na.omit(all_train)
+
+# Remove some odd "birth years"
+all_train_clean <- all_train_clean[!(all_train_clean$birth.year == "\\N"),]
+
+# Remove some people who clearly lied about their ages
+all_train_clean <- all_train_clean[!(all_train_clean$birth.year < 1929),]
+
+all_train_clean <- na.omit(all_train_clean)
+# Exporet the "training" dataset
+write.csv(all_train_clean, file = "CitiBike2014and2018_1M.csv")
+
+# Expore the FULL dataset!
+# write.csv(all, file = "CitiBike2014and2018.csv")
+
+```
